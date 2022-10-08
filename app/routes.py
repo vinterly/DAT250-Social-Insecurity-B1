@@ -44,9 +44,7 @@ def stream(username):
         if form.image.data:
             file_extension = os.path.splitext(form.image.data.filename)[1]
             filename = secure_filename(form.image.data.filename)
-            # ??? For some reason this works as it should, but logic dictates it should be "not in"
-            # but that results in 400 error when uploading an extension that should be allowed. What :|
-            if file_extension in app.config['ALLOWED_EXTENSIONS']:
+            if file_extension not in app.config['ALLOWED_EXTENSIONS']:
                 return "File not allowed", 400
             path = os.path.join(
                 app.config['UPLOAD_FOLDER'], filename)
