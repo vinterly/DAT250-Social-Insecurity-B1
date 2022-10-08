@@ -2,8 +2,14 @@ import os
 
 # contains application-wide configuration, and is loaded in __init__.py
 
+
 class Config(object):
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'secret' # TODO: Use this with wtforms
+    DEBUG = False,
+    # Secret key should be stored in .env - TODO at some point?
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'secret'
     DATABASE = 'database.db'
-    UPLOAD_PATH = 'app/static/uploads'
-    ALLOWED_EXTENSIONS = {} # Might use this at some point, probably don't want people to upload any file type
+    UPLOAD_FOLDER = 'app/static/uploads'
+    ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'gif', 'png'}
+    # Restrict uploads to 1 MB
+    # Not entirely sure if it works so TODO?
+    MAX_CONTENT_LENGTH = 1024 * 1024

@@ -1,6 +1,5 @@
 __pycache__
 .vscode
-venv/
-Pipfile
-Pipfile.lock
+venv
 .dccache
+.dcignore

@@ -1,7 +1,8 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for
 from app import app, query_db
 from app.forms import IndexForm, PostForm, FriendsForm, ProfileForm, CommentsForm
 from datetime import datetime
+from werkzeug.utils import secure_filename
 import os
 
 # this file contains all the different routes, and the logic for communicating with the database
@@ -14,7 +15,8 @@ import os
 def index():
     form = IndexForm()
 
-    if form.login.is_submitted() and form.login.submit.data:
+    # TODO: Make queries etc their own functions in database
+    if form.login.validate_on_submit():
         user = query_db(
             'SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
         if user is None:
@@ -24,7 +26,8 @@ def index():
         else:
             flash('Sorry, wrong password!')
 
-    elif form.register.is_submitted() and form.register.submit.data:
+    # TODO: Password hashing!
+    elif form.register.validate_on_submit():
         query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES("{}", "{}", "{}", "{}");'.format(form.register.username.data, form.register.first_name.data,
                                                                                                                         form.register.last_name.data, form.register.password.data))
         return redirect(url_for('index'))
@@ -37,10 +40,16 @@ def stream(username):
     form = PostForm()
     user = query_db(
         'SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
-    if form.is_submitted():
+    if form.validate_on_submit():
         if form.image.data:
+            file_extension = os.path.splitext(form.image.data.filename)[1]
+            filename = secure_filename(form.image.data.filename)
+            # ??? For some reason this works as it should, but logic dictates it should be "not in"
+            # but that results in 400 error when uploading an extension that should be allowed. What :|
+            if file_extension in app.config['ALLOWED_EXTENSIONS']:
+                return "File not allowed", 400
             path = os.path.join(
-                app.config['UPLOAD_PATH'], form.image.data.filename)
+                app.config['UPLOAD_FOLDER'], filename)
             form.image.data.save(path)
 
         query_db('INSERT INTO Posts (u_id, content, image, creation_time) VALUES({}, "{}", "{}", \'{}\');'.format(
@@ -57,7 +66,7 @@ def stream(username):
 @app.route('/comments/<username>/<int:p_id>', methods=['GET', 'POST'])
 def comments(username, p_id):
     form = CommentsForm()
-    if form.is_submitted():
+    if form.validate_on_submit():
         user = query_db(
             'SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
         query_db('INSERT INTO Comments (p_id, u_id, comment, creation_time) VALUES({}, {}, "{}", \'{}\');'.format(
@@ -76,7 +85,7 @@ def friends(username):
     form = FriendsForm()
     user = query_db(
         'SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
-    if form.is_submitted():
+    if form.validate_on_submit():
         friend = query_db(
             'SELECT * FROM Users WHERE username="{}";'.format(form.username.data), one=True)
         if friend is None:
@@ -95,7 +104,7 @@ def friends(username):
 @app.route('/profile/<username>', methods=['GET', 'POST'])
 def profile(username):
     form = ProfileForm()
-    if form.is_submitted():
+    if form.validate_on_submit():
         query_db('UPDATE Users SET education="{}", employment="{}", music="{}", movie="{}", nationality="{}", birthday=\'{}\' WHERE username="{}" ;'.format(
             form.education.data, form.employment.data, form.music.data, form.movie.data, form.nationality.data, form.birthday.data, username
         ))
