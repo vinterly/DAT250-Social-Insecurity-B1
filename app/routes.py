@@ -22,7 +22,7 @@ def index():
     # TODO: Make queries etc their own functions in database
     if form.login.validate_on_submit():
         user = query_db(
-            'SELECT * FROM Users WHERE username="{}";'.format(form.login.username.data), one=True)
+            'SELECT * FROM Users WHERE username=?;', [form.login.username.data], one=True)
         if user is None:
             flash('Sorry, this user does not exist!')
         elif check_password_hash(user['password'], form.login.password.data) == True:
@@ -75,8 +75,8 @@ def comments(p_id):
     if form.validate_on_submit():
         user = query_db(
             'SELECT * FROM Users WHERE username=?;' [session['username']], one=True)
-        query_db('INSERT INTO Comments (p_id, u_id, comment, creation_time) VALUES({}, {}, "{}", \'{}\');'.format(
-            p_id, user['id'], form.comment.data, datetime.now()))
+        query_db('INSERT INTO Comments (p_id, u_id, comment, creation_time) VALUES(?, ?, ?, ?);', [
+            p_id, user['id'], form.comment.data, datetime.now()])
 
     post = query_db('SELECT * FROM Posts WHERE id=?;', [p_id], one=True)
     all_comments = query_db('SELECT DISTINCT * FROM Comments AS c JOIN Users AS u ON c.u_id=u.id WHERE c.p_id=? ORDER BY c.creation_time DESC;',
