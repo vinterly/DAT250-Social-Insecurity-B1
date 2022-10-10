@@ -121,3 +121,21 @@ def profile(username):
     user = query_db(
         'SELECT * FROM Users WHERE username="{}";'.format(username), one=True)
     return render_template('profile.html', title='profile', username=username, user=user, form=form)
+
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
+
+@app.after_request
+def apply_caching(response):
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self' maxcdn.bootstrapcdn.com; script-src 'self' code.jquery.com cdnjs.cloudflare.com stackpath.bootstrapcdn.com; style-src 'self' maxcdn.bootstrapcdn.com stackpath.bootstrapcdn.com/"
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.set_cookie('username', 'flask', secure=True, httponly=True, samesite='Lax')
+    return response
+
+
+
