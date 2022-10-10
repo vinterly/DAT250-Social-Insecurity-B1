@@ -14,15 +14,15 @@ DROP TABLE IF EXISTS [Users];
 
 CREATE TABLE [Users] (
   id INTEGER PRIMARY KEY,
-  username VARCHAR,
-  first_name VARCHAR,
-  last_name VARCHAR,
-  [password] VARCHAR,
-  education VARCHAR DEFAULT 'Unknown',
-  employment VARCHAR DEFAULT 'Unknown',
-  music VARCHAR DEFAULT 'Unknown',
-  movie VARCHAR DEFAULT 'Unknown',
-  nationality VARCHAR DEFAULT 'Unknown',
+  username VARCHAR(20) NOT NULL UNIQUE,
+  first_name VARCHAR(20) NOT NULL,
+  last_name VARCHAR(20) NOT NULL,
+  [password] VARCHAR(120),
+  education VARCHAR(35) DEFAULT 'Unknown',
+  employment VARCHAR(35) DEFAULT 'Unknown',
+  music VARCHAR(40) DEFAULT 'Unknown',
+  movie VARCHAR(40) DEFAULT 'Unknown',
+  nationality VARCHAR(35) DEFAULT 'Unknown',
   birthday DATE DEFAULT 'Unknown'
 );
 
@@ -69,7 +69,7 @@ CREATE TABLE [Comments](
   id INTEGER PRIMARY KEY,
   p_id INTEGER,
   u_id INTEGER,
-  comment VARCHAR,
+  comment VARCHAR(250),
   [creation_time] DATETIME,
   FOREIGN KEY (p_id) REFERENCES Posts(id),
   FOREIGN KEY (u_id) REFERENCES Users(id)

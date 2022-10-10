@@ -11,10 +11,11 @@ csrf = CSRFProtect()
 app = Flask(__name__)
 Bootstrap(app)
 csrf.init_app(app)
-app.secret_key = g#&/vg59"#F04&)#
+app.secret_key = g  # &/vg59"#F04&)#
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config.from_object(Config)
+
 
 # TODO: Handle login management better, maybe with flask_login?
 # TODO: Update the entire app to Flask 2.x at some point? Outdated components.......
@@ -24,7 +25,8 @@ def load_user(user_id):
     '''conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT id, username, [password] from Users where id = (?)",[user_id]) '''
-    user_info = query_db('SELECT id, username, [password] FROM Users WHERE id="{}";'.format(user_id), one=True)
+    user_info = query_db(
+        'SELECT id, username, [password] FROM Users WHERE id=?;', [user_id], one=True)
     #user_info = cur.fetchone()
     if user_info == None:
         return None
@@ -33,23 +35,25 @@ def load_user(user_id):
 
 
 login_manager.login_view = 'login'
-class User(UserMixin):   
+
+
+class User(UserMixin):
     def __init__(self, id, username, password):
         self.id = id
         self.username = username
         self.password = password
-        self.authenticated = False                                                                              
+        self.authenticated = False
 
     def is_authenticated(self):
         return True
 
-    def is_active(self):   
-        return True           
+    def is_active(self):
+        return True
 
     def is_anonymous(self):
-        return False          
+        return False
 
-    def get_id(self):         
+    def get_id(self):
         return str(self.id)
 
 
@@ -77,9 +81,9 @@ def init_db():
 # perform generic query, not very secure yet
 
 
-def query_db(query, one=False):
+def query_db(query, args, one=False):
     db = get_db()
-    cursor = db.execute(query)
+    cursor = db.execute(query, args)
     rv = cursor.fetchall()
     cursor.close()
     db.commit()

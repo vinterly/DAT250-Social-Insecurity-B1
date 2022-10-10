@@ -26,7 +26,8 @@ class RegisterForm(FlaskForm):
                                                      Length(min=2, max=35, message='Last name must be at least 2 characters and no longer than 35 characters.')],
                             render_kw={'placeholder': 'Last Name'})
     username = StringField('Username', validators=[InputRequired(),
-                                                   Regexp(regex='^[A-Za-z0-9_]*$', message='Sorry, your username can only contain letters, numbers and underscores.'),
+                                                   Regexp(
+                                                       regex='^[A-Za-z0-9_]*$', message='Sorry, your username can only contain letters, numbers and underscores.'),
                                                    Length(min=3, max=20,
                                                           message='Please choose a username between 3 and 20 characters')],
                            render_kw={'placeholder': 'Username'})
