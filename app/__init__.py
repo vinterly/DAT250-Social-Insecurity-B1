@@ -83,11 +83,11 @@ def init_db():
 
 def query_db(query, args, one=False):
     db = get_db()
-    cursor = db.execute(query, args)
-    rv = cursor.fetchall()
-    cursor.close()
+    cur = db.execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
     db.commit()
-    return (rv[0] if rv else None) if one else rv
+    return(rv[0] if rv else None) if one else rv
 
 # TODO: Add more specific queries to simplify code, and make it more secure
 

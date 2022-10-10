@@ -35,7 +35,7 @@ def index():
             flash('Sorry, wrong password!')
     elif form.register.validate_on_submit():
         hash = generate_password_hash(form.register.password.data)
-        query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES(?, ?, ?, ?;',
+        query_db('INSERT INTO Users (username, first_name, last_name, password) VALUES(?, ?, ?, ?);',
                  [form.register.username.data, form.register.first_name.data, form.register.last_name.data, hash])
         return redirect(url_for('index'))
     return render_template('index.html', title='Welcome', form=form)
